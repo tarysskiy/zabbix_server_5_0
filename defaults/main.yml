@@ -70,7 +70,7 @@ zabbix_server_conf:
   dest: "/etc/zabbix/zabbix_server.conf"
   owner: root
   group: zabbix
-  mode: 0644 
+  mode: "644" 
 
 zabbix_web_conf:
 - src: "etc/zabbix/web/zabbix.conf.php.j2"
@@ -84,14 +84,14 @@ zabbix_nginx_conf:
   dest: "/etc/opt/rh/rh-nginx116/nginx/conf.d/zabbix.conf"
   owner: root
   group: root
-  mode: 0644
+  mode: "644"
 
 zabbix_apache_conf:
 - src: "etc/httpd/conf.d/zabbix.conf.j2"
   dest: "/etc/httpd/conf.d/zabbix.conf"
   owner: root
   group: root
-  mode: 0644
+  mode: "644"
 
 zabbix_apache_ssl_conf:
 - src: "etc/httpd/conf.d/ssl.conf.j2"
@@ -105,7 +105,7 @@ zabbix_php_fpm_conf:
   dest: "/etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf"
   owner: root
   group: root
-  mode: 0644
+  mode: "644"
 
 zabbix_alertscripts:
 - src: "usr/lib/zabbix/alertscripts/zabbix_telegram.sh.j2"
@@ -119,4 +119,3 @@ zabbix_server_state: restarted # started | restarted | stopped
 zabbix_frontend_state: restarted # started | restarted | stopped
 
 telegram_bot_token: "TOKEN"
-slack_url: "WEBHOOK"
