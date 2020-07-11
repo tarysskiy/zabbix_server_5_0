@@ -1,0 +1,57 @@
+---
+- name: "Install zabbix repo file"
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ zabbix_repo }}"
+
+- name: "Install zabbix-server"
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "zabbix-server-{{ zabbix_server_database }}"
+    - "centos-release-scl"
+    - "zabbix-web-{{ zabbix_server_database }}-scl"
+    - "zabbix-{{ zabbix_web_server }}-conf-scl"  
+    - "zabbix-agent"
+
+- name: "Create zabbix-server config file"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ zabbix_server_conf }}"  
+
+- name: "Check alertscripts dir"
+  file:
+    path: "{{ zabbix_alertscripts_dir }}"
+    state: directory
+    recurse: yes
+
+- name: "Add alertscripts"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ zabbix_alertscripts }}"
+
+- name: "Started zabbix-server"
+  service:
+    name: "{{ item }}"
+    state: "{{ zabbix_server_state }}"
+    enabled: yes
+  loop:
+    - "zabbix-server"
+    - "zabbix-agent"
+
+- name: "Zabbix-frontend install"
+  include: zabbix-frontend.yml

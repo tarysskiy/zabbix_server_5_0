@@ -1,0 +1,47 @@
+---
+
+- name: "Apache-ssl settings"
+  block:
+    - name: "Install httpd mod_ssl"
+      yum:
+        name: "mod_ssl"
+        state: present    
+
+    - name: "Copy apache ssl conf"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop: "{{ zabbix_apache_ssl_conf }}" 
+  when: zabbix_web_server == "apache"
+
+- name: "Check SSL dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "644" 
+  loop: 
+  - "{{ zabbix_frontend_ssl_certificate_dir }}"
+  - "{{ zabbix_frontend_ssl_key_dir }}"  
+
+- name: "Copy SSL certificate"
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ zabbix_frontend_ssl_certificate }}"
+
+- name: "Copy SSL key"
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ zabbix_frontend_ssl_key }}"

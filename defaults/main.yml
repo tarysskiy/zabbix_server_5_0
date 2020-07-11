@@ -1,0 +1,122 @@
+---
+zabbix_server_version: 5.0
+
+zabbix_repo_url: "https://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+
+zabbix_non_supported_repo: "http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+
+zabbix_repo_gpgchec: 0
+
+zabbix_repo_gpgcheck: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX"
+
+zabbix_server_database: mysql # mysql | pgsql
+
+zabbix_web_server: nginx # apache | nginx
+
+zabbix_server_db_name: zabbix
+
+zabbix_server_db_user: zabbix
+
+zabbix_server_db_password: zabbix
+
+zabbix_server_db_host: localhost
+
+zabbix_server_db_port: 3306 # 3306 | 5432
+
+zabbix_alertscripts_dir: "/usr/lib/zabbix/alertscripts"
+
+zabbix_frontend_ssl: 0 # 0 | 1
+
+zabbix_frontend_ssl_certificate_dir: "{%- if zabbix_web_server == 'nginx' -%} /etc/opt/rh/rh-nginx116/nginx/ssl/certs {%- else -%} /etc/httpd/ssl/certs {%- endif %}"
+
+zabbix_frontend_ssl_key_dir: "{%- if zabbix_web_server == 'nginx' -%} /etc/opt/rh/rh-nginx116/nginx/ssl/private {%- else -%} /etc/httpd/ssl/private {%- endif %}"
+
+# zabbix_frontend_ssl_certificate:
+# - src: "files/ssl/zabbix-server-node1.crt"
+#   dest: "{{ zabbix_frontend_ssl_certificate_dir }}/{{ inventory_hostname }}.crt"
+#   owner: root
+#   group: root
+#   mode: "644" 
+
+# zabbix_frontend_ssl_key:
+# - src: "files/ssl/zabbix-server-node1.key"
+#   dest: "{{ zabbix_frontend_ssl_key_dir }}/{{ inventory_hostname }}.key"
+#   owner: root
+#   group: root
+#   mode: "644" 
+
+zabbix_repo:
+  - name: zabbix
+    description: Zabbix Official Repository - $basearch
+    baseurl: "{{ zabbix_repo_url }}"
+    gpgcheck: "{{ zabbix_repo_gpgchec }}"
+    gpgkey: "{{ zabbix_repo_gpgcheck }}"
+    state: present 
+  - name: zabbix-frontend
+    description: Zabbix Official Repository zabbix-frontend - $basearch
+    baseurl: "{{ zabbix_repo_url }}/frontend"
+    gpgcheck: "{{ zabbix_repo_gpgchec }}"
+    gpgkey: "{{ zabbix_repo_gpgcheck }}"
+    state: present 
+  - name: zabbix-non-supported
+    description: Zabbix Official Repository non-supported - $basearch
+    baseurl: "{{ zabbix_non_supported_repo }}"
+    gpgcheck: "{{ zabbix_repo_gpgchec }}"
+    gpgkey: "{{ zabbix_repo_gpgcheck }}"
+    state: present
+
+zabbix_server_conf:
+- src: "etc/zabbix/zabbix_server.conf.j2"
+  dest: "/etc/zabbix/zabbix_server.conf"
+  owner: root
+  group: zabbix
+  mode: 0644 
+
+zabbix_web_conf:
+- src: "etc/zabbix/web/zabbix.conf.php.j2"
+  dest: "/etc/zabbix/web/zabbix.conf.php"
+  owner: apache
+  group: apache
+  mode: "644" 
+
+zabbix_nginx_conf:
+- src: "etc/opt/rh/rh-nginx116/nginx/conf.d/zabbix.conf.j2"
+  dest: "/etc/opt/rh/rh-nginx116/nginx/conf.d/zabbix.conf"
+  owner: root
+  group: root
+  mode: 0644
+
+zabbix_apache_conf:
+- src: "etc/httpd/conf.d/zabbix.conf.j2"
+  dest: "/etc/httpd/conf.d/zabbix.conf"
+  owner: root
+  group: root
+  mode: 0644
+
+zabbix_apache_ssl_conf:
+- src: "etc/httpd/conf.d/ssl.conf.j2"
+  dest: "/etc/httpd/conf.d/ssl.conf"
+  owner: root
+  group: root
+  mode: "644"
+
+zabbix_php_fpm_conf:
+- src: "etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf.j2"
+  dest: "/etc/opt/rh/rh-php72/php-fpm.d/zabbix.conf"
+  owner: root
+  group: root
+  mode: 0644
+
+zabbix_alertscripts:
+- src: "usr/lib/zabbix/alertscripts/zabbix_telegram.sh.j2"
+  dest: "{{ zabbix_alertscripts_dir }}/zabbix_telegram.sh"
+  owner: "zabbix"
+  group: "zabbix"
+  mode: "755"
+
+zabbix_server_state: restarted # started | restarted | stopped
+
+zabbix_frontend_state: restarted # started | restarted | stopped
+
+telegram_bot_token: "TOKEN"
+slack_url: "WEBHOOK"

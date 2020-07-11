@@ -1,0 +1,6 @@
+---
+- hosts: all
+  remote_user: root
+  become: yes
+  roles:
+    - /home/tarysskiy/git/gitlab/zabbix-server-install
