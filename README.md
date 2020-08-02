@@ -62,7 +62,11 @@ __zabbix_apache_ssl_conf__ - переменная используется дл�
 __zabbix_php_fpm_conf__ - переменная используется для деплоя конфигурации php-fpm на хост  
 
 __zabbix_alertscripts__ - переменная используется для деплоя скриптов оповещения на хост  
+ 
+__zabbix_server_state__ - статус сервиса zabbix-server ( "reloaded", "restarted", "started", "stopped" ) 
 
-__zabbix_server_state__ - статус сервиса zabbix-server ( "reloaded", "restarted", "started", "stopped" )    
+__zabbix_server_enabled__ - добавить ли процесс zabbix-server в автозагрузку ("true", "false")
 
 __zabbix_frontend_state__ - статус сервиса zabbix-frontend ( "reloaded", "restarted", "started", "stopped" )   
+
+__zabbix_server_enabled__ - добавить ли процессы zabbix-frontend в автозагрузку ("true", "false")
