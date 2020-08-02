@@ -8,6 +8,10 @@
     mode: "{{ item.mode }}"
   loop: "{{ zabbix_web_conf }}"  
 
+- name: "Zabbix-frontend SSL"
+  include: zabbix-frontend-ssl.yml
+  when: ( zabbix_frontend_ssl|int > 0 ) and ( zabbix_frontend_ssl_certificate is defined ) and ( zabbix_frontend_ssl_key is defined )
+
 - name: "Zabbix-Web-Nginx settings"
   block:
     - name: "Create zabbix-nginx config file"
@@ -27,11 +31,20 @@
         group: "{{ item.group }}"
         mode: "{{ item.mode }}"
       loop: "{{ zabbix_php_fpm_conf }}"  
+
+    - name: "Started zabbix-frontend for nginx"
+      service:
+        name: "{{ item }}"
+        state: "{{ zabbix_frontend_state }}"
+        enabled: "{{ zabbix_frontend_enabled }}"
+      loop:
+        - "rh-nginx116-nginx"
+        - "rh-php72-php-fpm"   
   when: zabbix_web_server == "nginx"    
 
 - name: "Zabbix-Web-Apache settings"
   block:
-    - name: "Create zabbix-nginx config file"
+    - name: "Create zabbix-apache config file"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
@@ -48,28 +61,13 @@
         group: "{{ item.group }}"
         mode: "{{ item.mode }}"
       loop: "{{ zabbix_php_fpm_conf }}"  
-  when: zabbix_web_server == "apache" 
-
-- name: "Zabbix-frontend SSL"
-  include: zabbix-frontend-ssl.yml
-  when: ( zabbix_frontend_ssl|int > 0 ) and ( zabbix_frontend_ssl_certificate is defined ) and ( zabbix_frontend_ssl_key is defined )
-
-- name: "Started zabbix-frontend for nginx"
-  service:
-    name: "{{ item }}"
-    state: "{{ zabbix_frontend_state }}"
-    enabled: yes
-  loop:
-    - "rh-nginx116-nginx"
-    - "rh-php72-php-fpm" 
-  when: zabbix_web_server == "nginx"
-
-- name: "Started zabbix-frontend for apache"
-  service:
-    name: "{{ item }}"
-    state: "{{ zabbix_frontend_state }}"
-    enabled: yes
-  loop:
-    - "httpd"
-    - "rh-php72-php-fpm" 
+    
+    - name: "Started zabbix-frontend for apache"
+      service:
+        name: "{{ item }}"
+        state: "{{ zabbix_frontend_state }}"
+        enabled: "{{ zabbix_frontend_enabled }}"
+      loop:
+        - "httpd"
+        - "rh-php72-php-fpm"   
   when: zabbix_web_server == "apache"

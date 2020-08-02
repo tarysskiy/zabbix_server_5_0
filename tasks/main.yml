@@ -48,7 +48,7 @@
   service:
     name: "{{ item }}"
     state: "{{ zabbix_server_state }}"
-    enabled: yes
+    enabled: "{{ zabbix_server_enabled }}"
   loop:
     - "zabbix-server"
     - "zabbix-agent"

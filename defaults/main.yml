@@ -114,8 +114,12 @@ zabbix_alertscripts:
   group: "zabbix"
   mode: "755"
 
-zabbix_server_state: restarted # started | restarted | stopped
+zabbix_server_state: "restarted" # started | restarted | stopped
 
-zabbix_frontend_state: restarted # started | restarted | stopped
+zabbix_server_enabled: "true" # true | false
+
+zabbix_frontend_enabled: "true" # true | false
+
+zabbix_frontend_state: "restarted" # started | restarted | stopped
 
 telegram_bot_token: "TOKEN"
